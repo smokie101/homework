@@ -1,0 +1,33 @@
+---
+- name: Enabling epel repo (CentOS/RHEL)
+  yum_repository:
+    name: epel
+    file: external_repos
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    gpgcheck: no
+
+- name: Installing default packages set
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "sudo"
+    - "git"
+    - "curl"
+    - "ncdu"
+    - "screen"
+    - "bzip2"
+    - "vim"
+    - "nmap-ncat"
+    - "wget"
+    - "python-pip"
+    - "htop"
+    - "tar"
+
+- name: Removing unused packages
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - yum-cron

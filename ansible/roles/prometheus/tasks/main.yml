@@ -1,0 +1,33 @@
+---
+- name: Download and extract Prometheus tarfile
+  unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Generate Prometheus systemd
+  template:
+    src: templates/prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+
+- name: Uploading Prometheus-alerting rules config
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "files/prometheus-alerting.rules", dst: "/opt/prometheus-{{ prometheus_version }}.linux-amd64/" }
+
+- name: Generating Prometheus config
+  template:
+    src: templates/prometheus.yml.j2
+    dest: /opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml
+  notify: Prometheus restart
+
+- name: Making sure that Prometheus service is up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - prometheus

@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 20s
+  scrape_timeout: 10s
+  evaluation_interval: 20s
+
+rule_files:
+  - /opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus-alerting.rules
+
+scrape_configs:
+  - job_name: 'General system metrics'
+    static_configs:
+         - targets:
+           - 192.168.55.252:9100
+           - 192.168.55.253:9100
+           - 192.168.55.254:9100
+
+  - job_name: 'Kafka metrics'
+    static_configs:
+    - targets:
+        - 192.168.55.254:9099 # rabbitmq_exporter

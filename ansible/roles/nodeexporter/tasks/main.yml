@@ -1,0 +1,21 @@
+---
+- name: Download and extract Node Exporter tarfile
+  unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Generate Prometheus-Nodeexporter systemd
+  template:
+    src: templates/prometheus-nodeexporter.service.j2
+    dest: /etc/systemd/system/prometheus-nodeexporter.service
+  notify: Restart node-exporter service
+
+- name: Making sure that Node Exporter service is up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - prometheus-nodeexporter

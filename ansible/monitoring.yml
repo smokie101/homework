@@ -1,0 +1,8 @@
+- name: Provisioning monitoring node
+  hosts: monitoring
+  become: true
+
+  roles:
+    - prometheus
+    - nodeexporter
+#    - grafana

@@ -1,0 +1,12 @@
+groups:
+
+- name: System Metrics
+  rules:
+  - alert: InstanceDown
+    expr: up{job="General system metrics"} == 0
+    for: 2m
+    labels:
+      severity: high
+    annotations:
+      summary: "{{$labels.job}} instance {{$labels.instance}} down (role: {{$labels.role}}\n"
+      description:  "{{$labels.job}} on {{$labels.instance}} has been down for more than 2 minutes.\n"

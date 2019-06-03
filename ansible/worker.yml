@@ -1,0 +1,38 @@
+- name: Deployment of worker server
+  hosts: workers
+
+  vars:
+    prometheus_components: [ "node_exporter" ]
+    consul_server_ip: "192.168.55.254"
+
+  roles:
+    - ansible-prometheus
+    - consul
+
+  tasks:
+
+    - name: Installing required packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+      with_items: ['stress', 'python-pip']
+
+    - name: Installing pika
+      pip:
+        name: pika
+        state: present
+
+    - name: Preparing consumer service
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: 'consumer.py', dest: '/usr/local/bin', mode: '0755' }
+        - { src: 'consumer.service', dest: '/etc/systemd/system', mode: '0644' }
+
+    - name: Starting and enabling consumer service
+      systemd:
+        name: consumer
+        state: started
+        enabled: yes
