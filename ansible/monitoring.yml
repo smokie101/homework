@@ -3,6 +3,7 @@
   become: true
 
   roles:
+    - init
     - prometheus
     - nodeexporter
-#    - grafana
+    - grafana

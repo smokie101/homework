@@ -1,0 +1,33 @@
+---
+- name: Installing default packages set for Kafka
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "yum-utils"
+
+- name: install the 'Development tools' package group
+  yum:
+    name: "@Development tools"
+    state: present
+
+- name: install the IUS rpm
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+    state: present
+
+- name: Installing default packages set for Kafka
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "python36u"
+    - "python36u-pip"
+    - "python36u-devel"
+
+- name: Uploading Python scripts for Kafka
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "files/prometheus-alerting.rules", dst: "/opt/prometheus-{{ prometheus_version }}.linux-amd64/" }

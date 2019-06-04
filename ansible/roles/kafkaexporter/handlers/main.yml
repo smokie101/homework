@@ -1,0 +1,5 @@
+---
+- name: Restart kafka-exporter service
+  systemd:
+    name: prometheus-kafkaexporter
+    state: restarted

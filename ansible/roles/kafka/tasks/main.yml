@@ -1,0 +1,44 @@
+---
+- name: Installing default packages set for Kafka
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "java-1.8.0-openjdk"
+
+- name: Download and extract Kafka tarfile
+  unarchive:
+    src: https://www.apache.org/dist/kafka/{{ kafka_version }}/kafka_2.11-{{ kafka_version }}.tgz
+    dest: /opt/
+    remote_src: yes
+
+- name: Generate Zookeeper systemd
+  template:
+    src: templates/zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+
+- name: Generate Kafka systemd
+  template:
+    src: templates/kafka.service.j2
+    dest: /etc/systemd/system/kafka.service
+
+- name: Making sure that Prometheus service is up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - kafka
+    - zookeeper
+
+- name: Enabling service on boot
+  systemd:
+    name: kafka
+    enabled: yes
+
+- name: Create topic nr1
+  shell: /opt/kafka_2.11-{{ kafka_version }}/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Input
+
+- name: Create topic nr2
+  shell: /opt/kafka_2.11-{{ kafka_version }}/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Output

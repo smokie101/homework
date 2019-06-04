@@ -22,7 +22,7 @@
     - "nmap-ncat"
     - "wget"
     - "python-pip"
-    - "htop"
+    - "net-tools"
     - "tar"
 
 - name: Removing unused packages

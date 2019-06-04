@@ -1,0 +1,75 @@
+---
+- name: Add Grafana repo
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "files/grafana.repo", dst: "/etc/yum.repos.d/" }
+
+- name: Installing default packages set for grafana
+  package:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - "fontconfig"
+    - "freetype*"
+    - "urw-fonts"
+    - "grafana"
+
+- name: Making sure that Grafana service is up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - grafana-server
+
+- name: Copy dashboard files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "files/kafka-db.json", dst: "/tmp" }
+    - { src: "files/node-db.json", dst: "/tmp" }
+
+- name: Create prometheus datasource
+  grafana_datasource:
+    name: "Prometheus"
+    grafana_url: "http://localhost:3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    ds_type: "prometheus"
+    is_default: "yes"
+    url: "http://localhost:9090"
+    validate_certs: false
+    state: present
+  notify: Restart grafana service
+
+- name: Import Grafana node exporter dashboard
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    state: present
+    message: Imported from Ansible
+    overwrite: yes
+    validate_certs: false
+    path: /tmp/node-db.json
+
+- name: Import Grafana kafka exporter dashboard
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    state: present
+    message: Imported from Ansible
+    overwrite: yes
+    validate_certs: false
+    path: /tmp/kafka-db.json
+  notify: Restart grafana service
+
+- name: Enabling service on boot
+  systemd:
+    name: grafana-server
+    enabled: yes

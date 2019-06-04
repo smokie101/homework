@@ -1,9 +1,9 @@
-- name: Provisioning Worker node
-  hosts: worker
+- name: Provisioning Kafka node
+  hosts: kafka
   become: true
 
   roles:
     - init
-    - worker
+    - kafka
     - kafkaexporter
     - nodeexporter

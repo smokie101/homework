@@ -17,4 +17,5 @@ scrape_configs:
   - job_name: 'Kafka metrics'
     static_configs:
     - targets:
-        - 192.168.55.254:9099 # rabbitmq_exporter
+        - 192.168.55.254:9092 # kafka_exporter
+        - 192.168.55.253:9092

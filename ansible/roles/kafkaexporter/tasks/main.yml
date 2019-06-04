@@ -1,0 +1,21 @@
+---
+- name: Download and extract Kafka Exporter tarfile
+  unarchive:
+    src: https://github.com/danielqsj/kafka_exporter/releases/download/v{{ kafka_exporter_version }}/kafka_exporter-{{ kafka_exporter_version }}.linux-amd64.tar.gz
+    dest: /opt/
+    remote_src: yes
+
+- name: Generate Prometheus-Kafkaexporter systemd
+  template:
+    src: templates/prometheus-kafkaexporter.service.j2
+    dest: /etc/systemd/system/prometheus-kafkaexporter.service
+  notify: Restart kafka-exporter service
+
+- name: Making sure that Kafka Exporter service is up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - prometheus-kafkaexporter
