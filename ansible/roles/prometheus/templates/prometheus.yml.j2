@@ -14,8 +14,12 @@ scrape_configs:
            - 192.168.55.253:9100
            - 192.168.55.254:9100
 
-  - job_name: 'Kafka metrics'
+  - job_name: 'Kafka exporter'
     static_configs:
     - targets:
-        - 192.168.55.254:9092 # kafka_exporter
-        - 192.168.55.253:9092
+        - 192.168.55.253:9308 # kafka_exporter
+
+  - job_name: 'JMX exporter'
+    static_configs:
+    - targets:
+        - 192.168.55.253:7071

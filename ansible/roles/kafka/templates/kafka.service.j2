@@ -6,6 +6,7 @@ After=zookeeper.service
 Type=simple
 ExecStart=/bin/sh -c '/opt/kafka_2.11-{{ kafka_version }}/bin/kafka-server-start.sh /opt/kafka_2.11-{{ kafka_version }}/config/server.properties > /opt/kafka_2.11-{{ kafka_version }}/kafka.log 2>&1'
 ExecStop=/opt/kafka_2.11-{{ kafka_version }}/bin/kafka-server-stop.sh
+Environment=KAFKA_OPTS=-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar=7071:/opt/jmx-exporter/jmx-exporter-conf.yml
 Restart=on-abnormal
 
 [Install]

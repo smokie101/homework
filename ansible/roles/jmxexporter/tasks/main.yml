@@ -1,0 +1,20 @@
+---
+- name: create directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/jmx-exporter
+
+- name: downlaod jmx exporter
+  get_url:
+    url: https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/{{ jmx_exporter_version }}/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar
+    dest: /opt/jmx-exporter
+
+- name: Uploading jmx-exporter config
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - { src: "files/jmx-exporter-conf.yml", dst: "/opt/jmx-exporter" }
+  notify: Zookeeper restart

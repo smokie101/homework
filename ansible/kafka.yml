@@ -3,7 +3,8 @@
   become: true
 
   roles:
-    - init
+#    - init
+#    - jmxexporter
     - kafka
     - kafkaexporter
     - nodeexporter

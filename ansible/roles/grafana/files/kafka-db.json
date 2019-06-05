@@ -1,11 +1,11 @@
 {
   "__inputs": [
     {
-      "name": "prometheus",
+      "name": "Prometheus",
       "label": "Prometheus",
       "description": "kafka_exporter",
       "type": "datasource",
-      "pluginId": "prometheus",
+      "pluginId": "Prometheus",
       "pluginName": "Prometheus"
     }
   ],
@@ -24,7 +24,7 @@
     },
     {
       "type": "datasource",
-      "id": "prometheus",
+      "id": "Prometheus",
       "name": "Prometheus",
       "version": "5.0.0"
     }

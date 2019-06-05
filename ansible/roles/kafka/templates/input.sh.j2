@@ -1,0 +1,7 @@
+#!/bin/bash
+service=kafka
+
+if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ))
+then
+/bin/sh -c '/opt/kafka_2.11-{{ kafka_version }}/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic Input --from-beginning &>> /var/log/kafka-input.log'
+fi

@@ -1,0 +1,10 @@
+[Unit]
+Description=Kafka consumer
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/bin/python /usr/local/bin/solution2.py
+
+[Install]
+WantedBy=multi-user.target

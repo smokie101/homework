@@ -3,7 +3,6 @@
   become: true
 
   roles:
-    - init
+#    - init
     - worker
-    - kafkaexporter
-    - nodeexporter
+#    - nodeexporter

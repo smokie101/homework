@@ -1,4 +1,9 @@
 ---
+- name: check if register file exists
+  stat:
+    path: /etc/.kafkaAnsible
+  register: stat_result
+
 - name: Installing default packages set for Kafka
   package:
     name: "{{ item }}"
@@ -11,6 +16,7 @@
     src: https://www.apache.org/dist/kafka/{{ kafka_version }}/kafka_2.11-{{ kafka_version }}.tgz
     dest: /opt/
     remote_src: yes
+  when: stat_result.stat.exists == False
 
 - name: Generate Zookeeper systemd
   template:
@@ -22,7 +28,22 @@
     src: templates/kafka.service.j2
     dest: /etc/systemd/system/kafka.service
 
-- name: Making sure that Prometheus service is up
+- name: Generate script 1
+  template:
+    src: templates/input.sh.j2
+    dest: /usr/local/bin/input.sh
+
+- name: Generate script 2
+  template:
+    src: templates/output.sh.j2
+    dest: /usr/local/bin/output.sh
+
+- name: Generate Kafka server.properties
+  template:
+    src: templates/server.properties.j2
+    dest: /opt/kafka_2.11-{{ kafka_version }}/config/server.properties
+
+- name: Making sure that services are up
   systemd:
     name: "{{ item }}"
     state: started
@@ -39,6 +60,36 @@
 
 - name: Create topic nr1
   shell: /opt/kafka_2.11-{{ kafka_version }}/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Input
+  when: stat_result.stat.exists == False
 
 - name: Create topic nr2
   shell: /opt/kafka_2.11-{{ kafka_version }}/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Output
+  when: stat_result.stat.exists == False
+
+#- name: Copy sh scripts
+#  copy:
+#    src: "{{ item.src }}"
+#    dest: "{{ item.dst }}"
+#  loop:
+#    - { src: "files/input.sh", dst: "/usr/local/bin" }
+#    - { src: "files/output.sh", dst: "/usr/local/bin" }
+
+- name: Add crontab entries
+  cron:
+    name: "Start Kafka topic logfiles"
+    special_time: reboot
+    job: "{{ item }}"
+  loop:
+    - "/usr/local/bin/input.sh"
+    - "/usr/local/bin/output.sh"
+
+- name: Execute the script
+  command: sh /usr/local/bin/input.sh
+
+- name: Execute the script
+  command: sh /usr/local/bin/output.sh
+
+- name: deploy file for register
+  file:
+    path: /etc/.kafkaAnsible
+    state: touch

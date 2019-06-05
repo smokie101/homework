@@ -16,7 +16,7 @@
     name: https://centos7.iuscommunity.org/ius-release.rpm
     state: present
 
-- name: Installing default packages set for Kafka
+- name: Installing default packages set for Python
   package:
     name: "{{ item }}"
     state: latest
@@ -30,4 +30,20 @@
     src: "{{ item.src }}"
     dest: "{{ item.dst }}"
   loop:
-    - { src: "files/prometheus-alerting.rules", dst: "/opt/prometheus-{{ prometheus_version }}.linux-amd64/" }
+    - { src: "files/solution1.py", dst: "/usr/local/bin/" }
+    - { src: "files/solution2.py", dst: "/usr/local/bin" }
+    - { src: "files/producer.service", dst: "/etc/systemd/system/" }
+    - { src: "files/consumer.service", dst: "/etc/systemd/system/" }
+
+- pip:
+    name: kafka-python
+
+- name: Making sure that Py script services are up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - producer
+    - consumer

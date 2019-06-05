@@ -31,6 +31,7 @@
     dest: "{{ item.dst }}"
   loop:
     - { src: "files/kafka-db.json", dst: "/tmp" }
+    - { src: "files/kafka2-db.json", dst: "/tmp" }
     - { src: "files/node-db.json", dst: "/tmp" }
 
 - name: Create prometheus datasource
@@ -67,6 +68,18 @@
     overwrite: yes
     validate_certs: false
     path: /tmp/kafka-db.json
+  notify: Restart grafana service
+
+- name: Import Grafana kafka exporter 2 dashboard
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    grafana_user: "admin"
+    grafana_password: "admin"
+    state: present
+    message: Imported from Ansible
+    overwrite: yes
+    validate_certs: false
+    path: /tmp/kafka2-db.json
   notify: Restart grafana service
 
 - name: Enabling service on boot
