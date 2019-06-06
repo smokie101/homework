@@ -1,0 +1,10 @@
+[Unit]
+Description=Kafka Input topic
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/bin/sh -c '/opt/kafka_2.11-{{ kafka_version }}/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic Input --from-beginning &>> /var/log/kafka-input.log'
+
+[Install]
+WantedBy=multi-user.target

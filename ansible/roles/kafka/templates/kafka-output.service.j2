@@ -1,0 +1,10 @@
+[Unit]
+Description=Kafka Output topic
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/bin/sh -c '/opt/kafka_2.11-{{ kafka_version }}/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic Output --from-beginning &>> /var/log/kafka-output.log'
+
+[Install]
+WantedBy=multi-user.target

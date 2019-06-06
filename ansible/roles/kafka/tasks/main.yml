@@ -38,6 +38,16 @@
     src: templates/output.sh.j2
     dest: /usr/local/bin/output.sh
 
+- name: Generate script 1 systemd
+  template:
+    src: templates/kafka-input.service.j2
+    dest: /etc/systemd/system/kafka-input.service
+
+- name: Generate script 2 systemd
+  template:
+    src: templates/kafka-output.service.j2
+    dest: /etc/systemd/system/kafka-output.service
+
 - name: Generate Kafka server.properties
   template:
     src: templates/server.properties.j2
@@ -66,28 +76,25 @@
   shell: /opt/kafka_2.11-{{ kafka_version }}/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic Output
   when: stat_result.stat.exists == False
 
-#- name: Copy sh scripts
-#  copy:
-#    src: "{{ item.src }}"
-#    dest: "{{ item.dst }}"
-#  loop:
-#    - { src: "files/input.sh", dst: "/usr/local/bin" }
-#    - { src: "files/output.sh", dst: "/usr/local/bin" }
+- name: Generate script 1 systemd
+  template:
+    src: templates/kafka-input.service.j2
+    dest: /etc/systemd/system/kafka-input.service
 
-- name: Add crontab entries
-  cron:
-    name: "Start Kafka topic logfiles"
-    special_time: reboot
-    job: "{{ item }}"
+- name: Generate script 2 systemd
+  template:
+    src: templates/kafka-output.service.j2
+    dest: /etc/systemd/system/kafka-output.service
+
+- name: Making sure that logging services are up
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
   loop:
-    - "/usr/local/bin/input.sh"
-    - "/usr/local/bin/output.sh"
-
-- name: Execute the script
-  command: sh /usr/local/bin/input.sh
-
-- name: Execute the script
-  command: sh /usr/local/bin/output.sh
+    - kafka-input
+    - kafka-output
 
 - name: deploy file for register
   file:

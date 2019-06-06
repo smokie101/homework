@@ -1,6 +1,6 @@
 broker.id=0
 
-advertised.listeners=PLAINTEXT://localhost:9092
+advertised.listeners=PLAINTEXT://{{ ansible_eth1.ipv4.address }}:9092
 
 num.network.threads=3
 

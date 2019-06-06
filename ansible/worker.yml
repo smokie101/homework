@@ -3,6 +3,6 @@
   become: true
 
   roles:
-#    - init
+    - init
     - worker
-#    - nodeexporter
+    - nodeexporter
